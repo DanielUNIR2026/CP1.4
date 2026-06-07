@@ -1,21 +1,31 @@
 pipeline {
  agent any
- stages {
- stage('Get Code') {
- steps {
- // Descarga el código fuente desde la rama develop
- checkout scm
- }
- }
- stage('Static Test') {
- steps {
- // Ejecuta Flake8 y Bandit
- sh 'flake8 /src'
- sh 'bandit -r /src'
- // Publica los informes
- archiveArtifacts artifacts: 'flake8.txt,
-bandit.txt', fingerprint: true
- }
- }
+    stages {
+        stage('Get Code') {
+            steps {
+            // Descarga el código fuente desde la rama develop
+                git branch :'develop', url: "https://github.com/DanielUNIR2026/CP1.4.git"
+            }
+        }
+        stage('Static Test') {
+            steps {
+                bat '''
+                    flake8 --exit-zero --format=pylint src > flake8.out
+                '''
+                
+                recordIssues tools: [
+                    flake8(name: 'Flake8', pattern: 'flake8.out')
+                ]
+
+                bat '''
+                    bandit --exit-zero -r src -f custom -o bandit.out --severity-level medium --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+                '''
+                
+                recordIssues tools: [
+                    pyLint(name: 'Bandit', pattern: 'bandit.out')
+                ]
+            }
+        }
+    }
 }
-}
+
