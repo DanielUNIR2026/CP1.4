@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Static Test') {
             steps {
-                bat '''
+                sh '''
                     flake8 --exit-zero --format=pylint src > flake8.out
                 '''
                 
@@ -17,7 +17,7 @@ pipeline {
                     flake8(name: 'Flake8', pattern: 'flake8.out')
                 ]
 
-                bat '''
+                sh '''
                     bandit --exit-zero -r src -f custom -o bandit.out --severity-level medium --msg-template "{abspath}:{line}: [{test_id}] {msg}"
                 '''
                 
