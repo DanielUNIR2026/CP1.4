@@ -9,8 +9,9 @@ pipeline {
         }
         stage('Static Test') {
             steps {
+                //instalación previa de módulos de flake 8 y bandit de python mediante sudo
                 sh '''
-                    python3 -m flake8 --exit-zero --format=pylint src > flake8.out
+                 flake8 --exit-zero --format=pylint src > flake8.out
                 '''
                 
                 recordIssues tools: [
@@ -18,7 +19,7 @@ pipeline {
                 ]
 
                 sh '''
-                    python3 -m bandit --exit-zero -r src -f custom -o bandit.out --severity-level medium --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+                    bandit --exit-zero -r src -f custom -o bandit.out --severity-level medium --msg-template "{abspath}:{line}: [{test_id}] {msg}"
                 '''
                 
                 recordIssues tools: [
