@@ -1,0 +1,21 @@
+pipeline {
+ agent any
+ stages {
+ stage('Get Code') {
+ steps {
+ // Descarga el código fuente desde la rama develop
+ checkout scm
+ }
+ }
+ stage('Static Test') {
+ steps {
+ // Ejecuta Flake8 y Bandit
+ sh 'flake8 /src'
+ sh 'bandit -r /src'
+ // Publica los informes
+ archiveArtifacts artifacts: 'flake8.txt,
+bandit.txt', fingerprint: true
+ }
+ }
+}
+}
