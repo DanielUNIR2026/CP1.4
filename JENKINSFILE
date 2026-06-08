@@ -1,0 +1,57 @@
+pipeline {
+ agent any
+    stages {
+        stage('Get Code') {
+            steps {
+            // Descarga el código fuente desde la rama develop
+                git branch :'develop', url: "https://github.com/DanielUNIR2026/CP1.4.git"
+            }
+        }
+        stage('Static Test') {
+            steps {
+                //instalación previa de módulos de flake 8 y bandit de python mediante sudo
+                sh '''
+                 flake8 --exit-zero --format=pylint /src > flake8.out
+                '''
+                
+                recordIssues tools: [
+                    flake8(name: 'Flake8', pattern: 'flake8.out')
+                ]
+
+                sh '''
+                    bandit --exit-zero -r /src -f custom -o bandit.out --severity-level medium --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+                '''
+                
+                recordIssues tools: [
+                    pyLint(name: 'Bandit', pattern: 'bandit.out')
+                ]
+            }
+        }
+        stage('Deploy'){
+            //desplegamos como hemos aprendido en la 1.3
+            steps{
+                sh'''
+                sam build
+                sam validate --region "us-east-1"
+                sam deploy
+                '''
+
+            }
+        }
+        stage('Promote'){
+            //si hemos llegado hasta aqui todo va muy bien y mergeamos a master como nos han pedido
+            steps{
+            sh'''
+            git fetch origin
+            git checkout master
+            git reset --hard origin/master
+            git remote set-url origin git@github.com:DanielUNIR2026/CP1.4.git
+            git merge origin/develop
+            git push origin master
+            '''
+            }
+
+        }
+    }
+}
+
