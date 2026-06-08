@@ -28,6 +28,7 @@ pipeline {
             }
         }
         stage('Deploy'){
+            //desplegamos como hemos aprendido en la 1.3
             steps{
                 sh'''
                 sam build
@@ -36,6 +37,19 @@ pipeline {
                 '''
 
             }
+        }
+        stage('Promote'){
+            //si hemos llegado hasta aqui todo va muy bien y mergeamos a master como nos han pedido
+            steps{
+            sh'''
+            git fetch origin
+            git checkout master
+            git reset --hard origin/master
+            git merge origin/develop
+            git push origin master
+            '''
+            }
+
         }
     }
 }
