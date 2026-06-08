@@ -4,7 +4,7 @@ pipeline {
         stage('Get Code') {
             steps {
             // Descarga el código fuente desde la rama develop
-                git branch :'develop', url: "https://github.com/DanielUNIR2026/CP1.4.git"
+                git branch :'develop', url: "git@github.com:DanielUNIR2026/CP1.4.git"
             }
         }
         stage('Static Test') {
@@ -45,6 +45,7 @@ pipeline {
             git fetch origin
             git checkout master
             git reset --hard origin/master
+            git remote set-url origin git@github.com:DanielUNIR2026/CP1.4.git
             git merge origin/develop
             git push origin master
             '''
