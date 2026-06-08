@@ -4,7 +4,7 @@ pipeline {
         stage('Get Code') {
             steps {
             // Descarga el código fuente desde la rama develop
-                git branch :'develop', url: "git@github.com:DanielUNIR2026/CP1.4.git"
+                git branch :'develop', url: "https://github.com/DanielUNIR2026/CP1.4.git"
             }
         }
         stage('Static Test') {
